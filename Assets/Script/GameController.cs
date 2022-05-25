@@ -14,7 +14,7 @@ public class GameController : MonoBehaviour
 
     // Dices
     public static int diceSideThrown = 0;
-    public enum DiceMode{Move, Attack, Defend, FreePoint, LosePoint, QuizMode}
+    public enum DiceMode{Move, DoubleMove, Attack, Defend, FreePoint, LosePoint, QuizMode}
     public static DiceMode diceMode;
 
     // Round
@@ -30,16 +30,20 @@ public class GameController : MonoBehaviour
     public static int battleTurn = 0;
     
     // Question
-    public GameObject quizManager;
+    [SerializeField] private QuizManager quizGameObject;
+    public static QuizManager quizManager;
     public static QuizAsset.QuestionType questionType;
     public static QuizAsset.QuestionDifficulty questionDifficulty;
 
 
-    private void Start() {
-        Debug.Log("TESTING QUESTION");
-        questionType = QuizAsset.QuestionType.Science;
-        questionDifficulty = QuizAsset.QuestionDifficulty.Easy;
 
+    public delegate void DiceModeChange(DiceMode newMode);
+    public static event DiceModeChange DiceModeChangeDel;
+
+    private static GameController instance;
+
+
+    private void Start() {
         int j = 0;
         for (int i = 0; i < numPlayer; i++)
         {
@@ -50,9 +54,13 @@ public class GameController : MonoBehaviour
                 j++;
             }
         }
+        // Assign static
+        instance = this;
+        quizManager = quizGameObject;
         numPlayer = j;
         diceMode = DiceMode.Move;
     }
+
 
     // Changing Dice Mode always result in game waiting for dice input
     public static void ChangeDiceMode(DiceMode newMode) {
@@ -60,10 +68,20 @@ public class GameController : MonoBehaviour
             DiceControl.coroutineAllowed = true;
             nextTurn = false;
             diceMode = newMode;
+            DiceModeChangeDel?.Invoke(diceMode);
+            if (diceMode == DiceMode.DoubleMove)
+            {
+                diceMode = DiceMode.Move;
+            }
         }
     }
+    
+    public static T RandomEnumValue<T> () {
+        var v = System.Enum.GetValues(typeof (T));
+        return (T) v.GetValue(Random.Range(0, v.Length));
+    }
 
-    public static bool ActionDone(BlockType blockType) {
+    public static bool BlockActionDone(BlockType blockType) {
         if (blockType == BlockType.Lucky)
         {
             ChangeDiceMode(DiceMode.FreePoint);
@@ -76,11 +94,10 @@ public class GameController : MonoBehaviour
         {
             // Play one more Move
             whoseTurn -= 1;
-            Debug.Log("Doulberu");
         }
         else if (blockType == BlockType.Quiz)
         {
-            Battle(false);
+            ChangeDiceMode(DiceMode.QuizMode);
         }
         else if (blockType == BlockType.PlayerHome)
         {
@@ -109,7 +126,7 @@ public class GameController : MonoBehaviour
         else if (diceMode == DiceMode.Attack)
         {
             player.playerAttribute.ChangeAttack(diceSideThrown);
-            ChangeDiceMode(DiceMode.Defend);
+            
             
             // Switcheroo attack <=> defend for next battle turn
             if (battleTurn == 0)
@@ -120,40 +137,58 @@ public class GameController : MonoBehaviour
             {
                 whoseTurn = attacker;
             }
-
+            ChangeDiceMode(DiceMode.Defend);
         }
         else if (diceMode == DiceMode.Defend)
         {
             player.playerAttribute.ChangeDefend(diceSideThrown);
-            ChangeDiceMode(DiceMode.Attack);
-            Debug.Log(battleTurn);
             battleTurn += 1;
+
             if (battleTurn >= 2)
             {
-                battleTurn = 0;
-                battleInProgress = false;
+                // start quiz
+                instance.StartCoroutine(instance.StartQuizCoroutine());
             }
+            else
+            {
+                ChangeDiceMode(DiceMode.Attack);
+            }
+        }
+        else if (diceMode == DiceMode.QuizMode)
+        {
+            player.playerAttribute.ChangeDefend(diceSideThrown);
         }
         if (!battleInProgress)
         {
             nextTurn = true;    
         }
-        
     }
-    public static void Battle(bool isPlayer, int opponentNumber = 0) {
+
+    public static void RandomizeQuestion() {
+        Debug.Log("CHANGING CATEGORY QUESTION");
+        questionType = RandomEnumValue<QuizAsset.QuestionType>();
+        questionDifficulty = QuizAsset.QuestionDifficulty.Easy;
+    }
+
+    public IEnumerator StartQuizCoroutine() {
+        quizManager.gameObject.SetActive(true);
+        yield return quizManager.StartCoroutine(quizManager.Questioning());
+        ResetBattle();
+    }
+
+    public static void ResetBattle() {
+        Debug.Log("RESET");
+        gettingAttacked = 0;
+        battleInProgress = false;
+        battleTurn = 0;
+        nextTurn = true;
+    }
+
+    public static void Battle(int opponentNumber = 0) {
         battleInProgress = true;
-        if (isPlayer)
-        {
-            attacker = whoseTurn;
-            gettingAttacked = opponentNumber + 1;
-            ChangeDiceMode(DiceMode.Attack);
-        }
-        else
-        {
-            ChangeDiceMode(DiceMode.Defend);
-            // Only Defend for bot battle (correct = win)
-            battleTurn = 1;
-        }
+        attacker = whoseTurn;
+        gettingAttacked = opponentNumber + 1;
+        ChangeDiceMode(DiceMode.Attack);
     }
     
     public static void NextTurn(){

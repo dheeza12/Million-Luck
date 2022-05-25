@@ -47,7 +47,8 @@ public class Path : MonoBehaviour
 
     public IEnumerator Move() {
         
-        int endIndex = startWaypoint + GameController.diceSideThrown + 1;
+        int endIndex = startWaypoint + GameController.diceSideThrown;
+        Debug.Log(endIndex);
         int step = GameController.diceSideThrown;
         bool newEndIndex = false;
         bool nextTurn = false;
@@ -64,111 +65,115 @@ public class Path : MonoBehaviour
         }
         
         while (!nextTurn) {
-            int destination = waypointIndex % BoardIterate.CountIndex();
+            int destination = (waypointIndex) % BoardIterate.CountIndex();
             // Check when player position is at destination block
 
-            if (endIndex == waypointIndex)
+            // Stop Position when battling
+            if (!GameController.battleInProgress)
             {
-                waypointIndex--;
-                startWaypoint = waypointIndex;
-                
-                // Waypoints store special block pointers
-                BlockType currentBlockType = BoardIterate.childsGameObject[startWaypoint % BoardIterate.CountIndex()].GetComponent<Waypoints>().blockType;
-                // Check if action done
-                nextTurn = GameController.ActionDone(currentBlockType);
-            }
-            else if (transform.position == BoardIterate.childsTransform[destination].position)
-            {
-                Waypoints available_waypoints = BoardIterate.childsGameObject[destination].GetComponent<Waypoints>();
-                
-                if (available_waypoints.CountWaypoints() > 0 & step > 0)
+                if (endIndex == waypointIndex - 1)
                 {
-                    newEndIndex = true;
+                    startWaypoint = waypointIndex - 1;
+                    // Waypoints store special block pointers
+                    BlockType currentBlockType = BoardIterate.childsGameObject[startWaypoint % BoardIterate.CountIndex()].GetComponent<Waypoints>().blockType;
+                    // Check if action done
+                    nextTurn = GameController.BlockActionDone(currentBlockType);
+                    
                 }
-                else
+                else if (transform.position == BoardIterate.childsTransform[destination].position)
                 {
-                    newEndIndex = false;
-                }
-                
-                // Compare waypoint
-                if (!GameController.battleInProgress)
-                {
-                    for (int i = 0; i < players_list.Length; i++)
+                    Waypoints available_waypoints = BoardIterate.childsGameObject[destination].GetComponent<Waypoints>();
+                    
+                    if (available_waypoints.CountWaypoints() > 0 & step > 0)
                     {
-                        if (i != GameController.whoseTurn - 1 & players_list[i] != null)
+                        newEndIndex = true;
+                    }
+                    else
+                    {
+                        newEndIndex = false;
+                    }
+                    // Compare waypoint between players
+                    if (!GameController.battleInProgress)
+                    {
+                        for (int i = 0; i < players_list.Length; i++)
                         {
-                            if (player_list_waypoint_index[i] == waypointIndex & step < GameController.diceSideThrown)
+                            // exclude self and null
+                            if (i != GameController.whoseTurn - 1 & players_list[i] != null)
                             {
-                                GameController.attacker = GameController.whoseTurn;
-                                GameController.gettingAttacked = i + 1;
-
-                                buttonsManager.battleDesuka.SetActive(true);
-                                // Wait for any Button pressed
-                                yield return waitBattleChoice.Reset();
-                                buttonsManager.battleDesuka.SetActive(false);
-                                if (waitBattleChoice.PressedButton == buttonsBattle[0])
+                                if (player_list_waypoint_index[i] == waypointIndex & step < GameController.diceSideThrown)
                                 {
-                                    GameController.Battle(isPlayer: true, opponentNumber: i);
+                                    GameController.attacker = GameController.whoseTurn;
+                                    GameController.gettingAttacked = i + 1;
 
-                                    endIndex = player_list_waypoint_index[i] + 1;
-                                    newEndIndex = false;
+                                    buttonsManager.battleDesuka.SetActive(true);
+                                    // Wait for any Button pressed
+                                    yield return waitBattleChoice.Reset();
+                                    buttonsManager.battleDesuka.SetActive(false);
+                                    if (waitBattleChoice.PressedButton == buttonsBattle[0])
+                                    {
+                                        GameController.Battle(opponentNumber: i);
+                                        endIndex = player_list_waypoint_index[i];
+                                        newEndIndex = false;
+                                    }
+                                    
+                                    
                                 }
-                                
-                                
                             }
                         }
                     }
-                }
-                
+                    
 
-                if (newEndIndex)
-                {
-                    if (available_waypoints.CountWaypoints() == 1)
+                    if (newEndIndex)
                     {
-                        waypointIndex = available_waypoints.waypoints[0].indexNumber;
-                        endIndex = waypointIndex + step;
-                    }
-                    else if (available_waypoints.CountWaypoints() > 1)
-                    {
-                        // Intersection
-                        for (int i = 0; i < available_waypoints.CountWaypoints(); i++)
-                        {
-                            buttonsWaypoint[i].gameObject.SetActive(true);
-                            // Button shown may be wrong when passing multiple intersection
-                            int posShowButtons = (available_waypoints.waypoints[i].indexNumber + step - 1) % BoardIterate.CountIndex();
-                            buttonsWaypoint[i].transform.position = BoardIterate.childsTransform[posShowButtons].transform.position;
-                        }
-                        yield return waitWaypointChoice.Reset();
-                        if (waitWaypointChoice.PressedButton == buttonsWaypoint[0])
+                        if (available_waypoints.CountWaypoints() == 1)
                         {
                             waypointIndex = available_waypoints.waypoints[0].indexNumber;
+                            endIndex = (waypointIndex - 1) + step;
                         }
-                        else if (waitWaypointChoice.PressedButton == buttonsWaypoint[1])
+                        else if (available_waypoints.CountWaypoints() > 1)
                         {
-                            waypointIndex = available_waypoints.waypoints[1].indexNumber;
-                        }
-                        endIndex = waypointIndex + step;
-                        foreach (Button button in buttonsWaypoint)
-                        {
-                            button.gameObject.SetActive(false);
+                            // Intersection
+                            for (int i = 0; i < available_waypoints.CountWaypoints(); i++)
+                            {
+                                buttonsWaypoint[i].gameObject.SetActive(true);
+                                // Button shown may be wrong when passing multiple intersection
+                                int posShowButtons = (available_waypoints.waypoints[i].indexNumber + step) % BoardIterate.CountIndex();
+                                buttonsWaypoint[i].transform.position = BoardIterate.childsTransform[posShowButtons].transform.position;
+                            }
+                            yield return waitWaypointChoice.Reset();
+                            if (waitWaypointChoice.PressedButton == buttonsWaypoint[0])
+                            {
+                                waypointIndex = available_waypoints.waypoints[0].indexNumber;
+                            }
+                            else if (waitWaypointChoice.PressedButton == buttonsWaypoint[1])
+                            {
+                                waypointIndex = available_waypoints.waypoints[1].indexNumber;
+                            }
+                            endIndex = (waypointIndex - 1) + step;
+                            foreach (Button button in buttonsWaypoint)
+                            {
+                                button.gameObject.SetActive(false);
+                            }
                         }
                     }
+                    else
+                    {
+                        waypointIndex++;    
+                    }
+                    step--;
+                    yield return new WaitForSeconds(0.22f);
                 }
                 else
                 {
-                    waypointIndex++;    
+                    transform.position = Vector2.MoveTowards(transform.position, BoardIterate.childsTransform[destination].position, moveSpeed * Time.deltaTime);
                 }
-                step--;
-                yield return new WaitForSeconds(0.22f);
-            }
-            else
-            {
-                transform.position = Vector2.MoveTowards(transform.position, BoardIterate.childsTransform[destination].position, moveSpeed * Time.deltaTime);
             }
 
             yield return new WaitForEndOfFrame();
         }
         // Next turn
+        // wayppointIndex point to the next block, we want it to be at start when next turn
+        waypointIndex--;
         GameController.NextTurn();
        
     }    

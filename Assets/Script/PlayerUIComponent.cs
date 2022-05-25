@@ -4,7 +4,7 @@ using UnityEngine;
 using TMPro;
 using AttributeChange;
 
-public class UIComponent : MonoBehaviour
+public class PlayerUIComponent : MonoBehaviour
 {
     [SerializeField] private PlayerAttribute player;
 
@@ -24,25 +24,28 @@ public class UIComponent : MonoBehaviour
         
     }
 
+    [Header("UI Components")]
+    [Header("Hp and win conditions")]
     [SerializeField] private TextMeshProUGUI hpText;
-    [SerializeField] private TextMeshProUGUI scoreText;
+    [SerializeField] private TextMeshProUGUI MoneyText;
     [SerializeField] private TextMeshProUGUI winText;
     
-    [SerializeField] private TextMeshProUGUI playerName;
-    [SerializeField] private TextMeshProUGUI constestantNo;
+    [Header("Identity")]
+    [SerializeField] private TextMeshProUGUI constestantNoText;
+    [SerializeField] private TextMeshProUGUI playerNameText;
     
     
     private void Start() {
         // Set Name
         if (player.playerName != "")
         {
-            playerName.SetText(player.playerName);
+            playerNameText.SetText(player.playerName);
         }
         else
         {
-            playerName.SetText(player.gameObject.name);
+            playerNameText.SetText(player.gameObject.name);
         }
-        constestantNo.SetText("CONTESTANT "+ player.name[player.name.Length - 1]);
+        constestantNoText.SetText("CONTESTANT "+ player.name[player.name.Length - 1]);
         
     }
 
@@ -52,7 +55,7 @@ public class UIComponent : MonoBehaviour
 
     private void UpdatePlayerUI(ChangedPoint changedEnum, int hp, int score, int win) {
         hpText.SetText(string.Format("{0}/{1}", hp, player.maxHP));
-        scoreText.SetText(score.ToString());
+        MoneyText.SetText(score.ToString());
         winText.SetText(win.ToString());
     }
 }
