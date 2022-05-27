@@ -21,21 +21,22 @@ public class GameController : MonoBehaviour
     public static int whoseTurn = 1;
     public static bool nextTurn;
     public static int round = 1;
-    public static bool gameOver = false; 
-    
+    public static bool gameOver = false;
+
     // Battle Mode
+    [SerializeField] private BattleSFX battleStatusDisplay;
+    private static BattleSFX battleStatus;
+
     public static int attacker;
     public static int gettingAttacked;
     public static bool battleInProgress = false;
     public static int battleTurn = 0;
     
     // Question
-    [SerializeField] private QuizManager quizGameObject;
-    public static QuizManager quizManager;
+    [SerializeField] private QuizManager quizManagerAssign;
+    private static QuizManager quizManager;
     public static QuizAsset.QuestionType questionType;
     public static QuizAsset.QuestionDifficulty questionDifficulty;
-
-
 
     public delegate void DiceModeChange(DiceMode newMode);
     public static event DiceModeChange DiceModeChangeDel;
@@ -56,11 +57,11 @@ public class GameController : MonoBehaviour
         }
         // Assign static
         instance = this;
-        quizManager = quizGameObject;
+        quizManager = quizManagerAssign;
+        battleStatus = battleStatusDisplay;
         numPlayer = j;
         diceMode = DiceMode.Move;
     }
-
 
     // Changing Dice Mode always result in game waiting for dice input
     public static void ChangeDiceMode(DiceMode newMode) {
@@ -189,10 +190,10 @@ public class GameController : MonoBehaviour
         attacker = whoseTurn;
         gettingAttacked = opponentNumber + 1;
         ChangeDiceMode(DiceMode.Attack);
+        battleStatus.gameObject.SetActive(true);
     }
     
     public static void NextTurn(){
-        
         whoseTurn += 1;
         if (whoseTurn > numPlayer)
         {

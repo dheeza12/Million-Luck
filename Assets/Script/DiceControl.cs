@@ -26,7 +26,15 @@ public class DiceControl : MonoBehaviour
     }
 
     public void RollAnyway() {
-        StartCoroutine("RollTheDice");
+        if (!GameController.gameOver && coroutineAllowed)
+        {
+            StartCoroutine("RollTheDice");
+        }
+    }
+
+    public void ResetPos()
+    {
+        transform.localPosition = new Vector3(0, 0, 0);
     }
 
     private IEnumerator RollTheDice(){

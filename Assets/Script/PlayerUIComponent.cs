@@ -6,8 +6,6 @@ using AttributeChange;
 
 public class PlayerUIComponent : MonoBehaviour
 {
-    [SerializeField] private PlayerAttribute player;
-
     private void OnEnable() 
     {
         player.NotInGame += DisableUI;
@@ -23,7 +21,7 @@ public class PlayerUIComponent : MonoBehaviour
         }
         
     }
-
+    [SerializeField] private PlayerAttribute player;
     [Header("UI Components")]
     [Header("Hp and win conditions")]
     [SerializeField] private TextMeshProUGUI hpText;
@@ -44,6 +42,7 @@ public class PlayerUIComponent : MonoBehaviour
         else
         {
             playerNameText.SetText(player.gameObject.name);
+            player.playerName = player.gameObject.name;
         }
         constestantNoText.SetText("CONTESTANT "+ player.name[player.name.Length - 1]);
         

@@ -10,14 +10,15 @@ public class PlayerAttribute : MonoBehaviour
 
     [Header("Player Attributes")]
     [SerializeField] public int maxHP;
-    private int hp;
+    [HideInInspector] public int hp;
     
-    [SerializeField] private int score = 0;
-    [SerializeField] private int win = 0;
+    [Header("Win Conditions")]
+    [SerializeField] public int level = 0;
+    [SerializeField] public int score = 0;
+    [SerializeField] public int win = 0;
 
-    
-    private int attack;
-    private int defend;
+    [HideInInspector] public int attack;
+    [HideInInspector] public int defend;
 
 
     public delegate void PlayerStart();
@@ -25,6 +26,9 @@ public class PlayerAttribute : MonoBehaviour
 
     public delegate void PlayerAction(ChangedPoint mode, int hp, int score, int win);
     public event PlayerAction StatChanged;
+
+    public delegate void BattleStat(ChangedPoint mode);
+    public static event BattleStat BattleStatChanged;
 
     private void Start() {
         // In play, Shoot event to let UI update
@@ -67,12 +71,12 @@ public class PlayerAttribute : MonoBehaviour
 
     public void ChangeAttack(int atk) {
         attack = atk;
-        Debug.Log(attack);
+        BattleStatChanged?.Invoke(ChangedPoint.attackMode);
     }
 
     public void ChangeDefend(int def) {
         defend = def;
-        Debug.Log(def);
+        BattleStatChanged?.Invoke(ChangedPoint.defMode);
     }    
     
 }

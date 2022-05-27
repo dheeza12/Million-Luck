@@ -137,7 +137,7 @@ public class Path : MonoBehaviour
                             {
                                 buttonsWaypoint[i].gameObject.SetActive(true);
                                 // Button shown may be wrong when passing multiple intersection
-                                int posShowButtons = (available_waypoints.waypoints[i].indexNumber + step) % BoardIterate.CountIndex();
+                                int posShowButtons = (available_waypoints.waypoints[i].indexNumber - 1 + step) % BoardIterate.CountIndex();
                                 buttonsWaypoint[i].transform.position = BoardIterate.childsTransform[posShowButtons].transform.position;
                             }
                             yield return waitWaypointChoice.Reset();

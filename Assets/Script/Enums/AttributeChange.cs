@@ -2,9 +2,11 @@ namespace AttributeChange
 {
     public enum ChangedPoint
     {
-        hpChanged, 
-        scoreChanged, 
+        hpChanged,
+        scoreChanged,
         winChanged,
-        ResetChanged
+        ResetChanged,
+        attackMode,
+        defMode
     }
 }

@@ -43,3 +43,9 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: UI - Screen space
+    uniqueID: 1204733121
+    locked: 0
+  - name: Dice
+    uniqueID: 1197655239
+    locked: 0

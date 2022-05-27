@@ -6,12 +6,18 @@ using TMPro;
 
 public class QuizManager : MonoBehaviour
 {
+    [SerializeField] private TextMeshProUGUI playerTurn;
     [SerializeField] private QuizStore quizStore;
     [SerializeField] private TextMeshProUGUI question;
     [SerializeField] private Button[] answers;
+
     private WaitForUIButtons waitAnswerChoices;
     private int currentQuestion;
     private QuizAsset quizAsset = null;
+    private PlayerAttribute player0;
+    private PlayerAttribute player1;
+
+
 
     private void OnEnable() {
         // Select Category
@@ -31,9 +37,14 @@ public class QuizManager : MonoBehaviour
             quizAsset = quizStore.quizAssets[Random.Range(0, quizStore.quizAssets.Length)];
         }
 
+        player0 = GameController.players_ingame[GameController.attacker - 1].GetComponent<PlayerAttribute>();
+        player1 = GameController.players_ingame[GameController.gettingAttacked - 1].GetComponent<PlayerAttribute>();
+
         // Random pick
         currentQuestion = Random.Range(0, quizAsset.questionAndAnswers.Count);
         // Display Q
+        playerTurn.SetText(string.Format("{0}...Answer me this", player0.playerName));
+        playerTurn.alignment = TextAlignmentOptions.Left;
         GenerateQuestion();
 
         // Assign & Display Answer
@@ -44,12 +55,34 @@ public class QuizManager : MonoBehaviour
     public IEnumerator Questioning() {
         Debug.Log("Start QUESTIONING");
         yield return waitAnswerChoices.Reset();
-        AnswerScript pressedButton = waitAnswerChoices.PressedButton.GetComponent<AnswerScript>();
-        if (pressedButton.isCorrect)
+        AnswerScript starterPressedButton = waitAnswerChoices.PressedButton.GetComponent<AnswerScript>();
+
+        if (GameController.gettingAttacked > 0)
         {
-            
+            playerTurn.SetText(string.Format("{0}...Answer me this", player1.playerName));
+            playerTurn.alignment = TextAlignmentOptions.Right;
+            yield return waitAnswerChoices.Reset();
+            AnswerScript AttackedPressedButton = waitAnswerChoices.PressedButton.GetComponent<AnswerScript>();
+
+            // Mean wait for 2nd player to answer first
+            // 2nd player will know the if it is correct first
+            if (AttackedPressedButton.isCorrect)
+            {
+                GameController.players_ingame[GameController.gettingAttacked - 1].GetComponent<PlayerAttribute>().ChangeWinPoint(2);
+            }
+            AttackedPressedButton.Answer();
         }
-        pressedButton.Answer();
+                
+        if (starterPressedButton.isCorrect)
+        {
+            GameController.players_ingame[GameController.attacker - 1].GetComponent<PlayerAttribute>().ChangeWinPoint(2);
+        }
+        else
+        {
+
+        }
+        starterPressedButton.Answer();
+
         gameObject.SetActive(false);
     }
 
