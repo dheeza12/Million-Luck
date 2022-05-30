@@ -6,6 +6,17 @@ using AttributeChange;
 
 public class PlayerUIComponent : MonoBehaviour
 {
+    [SerializeField] private PlayerAttribute player;
+    [Header("UI Components")]
+    [Header("Hp and win conditions")]
+    [SerializeField] private TextMeshProUGUI hpText;
+    [SerializeField] private TextMeshProUGUI MoneyText;
+    [SerializeField] private TextMeshProUGUI winText;
+
+    [Header("Identity")]
+    [SerializeField] private TextMeshProUGUI constestantNoText;
+    [SerializeField] private TextMeshProUGUI playerNameText;
+
     private void OnEnable() 
     {
         player.NotInGame += DisableUI;
@@ -21,16 +32,6 @@ public class PlayerUIComponent : MonoBehaviour
         }
         
     }
-    [SerializeField] private PlayerAttribute player;
-    [Header("UI Components")]
-    [Header("Hp and win conditions")]
-    [SerializeField] private TextMeshProUGUI hpText;
-    [SerializeField] private TextMeshProUGUI MoneyText;
-    [SerializeField] private TextMeshProUGUI winText;
-    
-    [Header("Identity")]
-    [SerializeField] private TextMeshProUGUI constestantNoText;
-    [SerializeField] private TextMeshProUGUI playerNameText;
     
     
     private void Start() {

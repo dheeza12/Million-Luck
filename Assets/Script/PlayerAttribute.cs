@@ -17,10 +17,10 @@ public class PlayerAttribute : MonoBehaviour
     [SerializeField] public int score = 0;
     [SerializeField] public int win = 0;
 
-    [HideInInspector] public int attack;
-    [HideInInspector] public int defend;
+    public int attack;
+    public int defend;
 
-
+    // delegate events
     public delegate void PlayerStart();
     public event PlayerStart NotInGame;
 
@@ -45,6 +45,12 @@ public class PlayerAttribute : MonoBehaviour
         }
     }
 
+    public void ResetAtkDef()
+    {
+        attack = 0;
+        defend = 0;
+    }
+
     public void Refresh() {
         hp = maxHP;
         score = 0;
@@ -54,6 +60,7 @@ public class PlayerAttribute : MonoBehaviour
 
     public void ChangeHitPoint(int hit) {
         hp += hit;
+        Debug.Log(hit);
         StatChanged?.Invoke(ChangedPoint.hpChanged, hp, score, win);
     }
     public void ChangeScorePoint(int hit) {

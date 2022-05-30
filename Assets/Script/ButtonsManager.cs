@@ -13,4 +13,18 @@ public class ButtonsManager : MonoBehaviour
 
     [Header("Battle Prompt UI")]
     public GameObject battleDesuka;
+
+    public static ButtonsManager Instance { get; private set; }
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 }

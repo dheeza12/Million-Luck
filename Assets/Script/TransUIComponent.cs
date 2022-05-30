@@ -7,11 +7,11 @@ public class TransUIComponent : MonoBehaviour
 {
     // DiceMode{Move, Attack, Defend, FreePoint, LosePoint, QuizMode}
     private void OnEnable() {
-        GameController.DiceModeChangeDel += ChangeMode;
+        GameController.Instance.DiceModeChangeEvent += ChangeMode;
     }
 
     private void OnDisable() {
-        GameController.DiceModeChangeDel -= ChangeMode;
+        GameController.Instance.DiceModeChangeEvent -= ChangeMode;
     }
 
     private int curPlayer;

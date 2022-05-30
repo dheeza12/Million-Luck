@@ -13,7 +13,6 @@ public class Path : MonoBehaviour
     [SerializeField] private float moveSpeed = 5f;
 
     [HideInInspector] public PlayerAttribute playerAttribute;
-    [SerializeField] private ButtonsManager buttonsManager;
     private WaitForUIButtons waitWaypointChoice;
     private WaitForUIButtons waitBattleChoice;
     private Button[] buttonsWaypoint;
@@ -21,7 +20,7 @@ public class Path : MonoBehaviour
 
     private void Start() {  
         playerAttribute = GetComponent<PlayerAttribute>();
-        for (int i = 0; i < BoardIterate.CountIndex(); i++)
+        for (int i = 0; i < BoardIterate.boardCount; i++)
         {
             // Find starter block using loop to find name that match in Board
             // Starter1, Starter2, ... *might change to into an attribute at Waypoints*
@@ -32,11 +31,11 @@ public class Path : MonoBehaviour
                 startWaypoint = i;
             }
         }
-        buttonsWaypoint = buttonsManager.buttonsWaypoint;
-        buttonsBattle = buttonsManager.buttonsBattle;
-        waitWaypointChoice = new WaitForUIButtons(buttonsWaypoint);
-        waitBattleChoice = new WaitForUIButtons(buttonsBattle);
-        
+        waitWaypointChoice = new WaitForUIButtons(ButtonsManager.Instance.buttonsWaypoint);
+        waitBattleChoice = new WaitForUIButtons(ButtonsManager.Instance.buttonsBattle);
+        buttonsWaypoint = ButtonsManager.Instance.buttonsWaypoint;
+        buttonsBattle = ButtonsManager.Instance.buttonsBattle;
+
     }
 
     public void StartMove(){
@@ -48,15 +47,14 @@ public class Path : MonoBehaviour
     public IEnumerator Move() {
         
         int endIndex = startWaypoint + GameController.diceSideThrown;
-        Debug.Log(endIndex);
         int step = GameController.diceSideThrown;
-        bool newEndIndex = false;
+        bool newEndIndex;
         bool nextTurn = false;
 
         // others' waypointIndex/startWaypoint to compare
         Transform[] players_list = GameController.players_ingame;
         int[] player_list_waypoint_index = new int[4];
-        for (int i = 0; i < players_list.Length; i++)
+        for (int i = 0; i < player_list_waypoint_index.Length; i++)
         {
             if (players_list[i] != null)
             {
@@ -65,7 +63,7 @@ public class Path : MonoBehaviour
         }
         
         while (!nextTurn) {
-            int destination = (waypointIndex) % BoardIterate.CountIndex();
+            int destination = (waypointIndex) % BoardIterate.boardCount;
             // Check when player position is at destination block
 
             // Stop Position when battling
@@ -75,10 +73,9 @@ public class Path : MonoBehaviour
                 {
                     startWaypoint = waypointIndex - 1;
                     // Waypoints store special block pointers
-                    BlockType currentBlockType = BoardIterate.childsGameObject[startWaypoint % BoardIterate.CountIndex()].GetComponent<Waypoints>().blockType;
+                    BlockType currentBlockType = BoardIterate.childsGameObject[startWaypoint % BoardIterate.boardCount].GetComponent<Waypoints>().blockType;
                     // Check if action done
-                    nextTurn = GameController.BlockActionDone(currentBlockType);
-                    
+                    nextTurn = GameController.Instance.BlockActionDone(currentBlockType);
                 }
                 else if (transform.position == BoardIterate.childsTransform[destination].position)
                 {
@@ -95,7 +92,7 @@ public class Path : MonoBehaviour
                     // Compare waypoint between players
                     if (!GameController.battleInProgress)
                     {
-                        for (int i = 0; i < players_list.Length; i++)
+                        for (int i = 0; i < player_list_waypoint_index.Length; i++)
                         {
                             // exclude self and null
                             if (i != GameController.whoseTurn - 1 & players_list[i] != null)
@@ -105,13 +102,14 @@ public class Path : MonoBehaviour
                                     GameController.attacker = GameController.whoseTurn;
                                     GameController.gettingAttacked = i + 1;
 
-                                    buttonsManager.battleDesuka.SetActive(true);
+                                    // Activating prompt to ask if battle
+                                    ButtonsManager.Instance.battleDesuka.SetActive(true);
                                     // Wait for any Button pressed
                                     yield return waitBattleChoice.Reset();
-                                    buttonsManager.battleDesuka.SetActive(false);
+                                    ButtonsManager.Instance.battleDesuka.SetActive(false);
                                     if (waitBattleChoice.PressedButton == buttonsBattle[0])
                                     {
-                                        GameController.Battle(opponentNumber: i);
+                                        yield return StartCoroutine(GameController.Instance.PlayerBattle(opponentNumber: i));
                                         endIndex = player_list_waypoint_index[i];
                                         newEndIndex = false;
                                     }
@@ -137,7 +135,7 @@ public class Path : MonoBehaviour
                             {
                                 buttonsWaypoint[i].gameObject.SetActive(true);
                                 // Button shown may be wrong when passing multiple intersection
-                                int posShowButtons = (available_waypoints.waypoints[i].indexNumber - 1 + step) % BoardIterate.CountIndex();
+                                int posShowButtons = (available_waypoints.waypoints[i].indexNumber - 1 + step) % BoardIterate.boardCount;
                                 buttonsWaypoint[i].transform.position = BoardIterate.childsTransform[posShowButtons].transform.position;
                             }
                             yield return waitWaypointChoice.Reset();
@@ -174,7 +172,7 @@ public class Path : MonoBehaviour
         // Next turn
         // wayppointIndex point to the next block, we want it to be at start when next turn
         waypointIndex--;
-        GameController.NextTurn();
+        GameController.Instance.NextTurn();
        
     }    
 }

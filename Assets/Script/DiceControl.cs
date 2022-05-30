@@ -7,13 +7,24 @@ public class DiceControl : MonoBehaviour
     private Sprite[] diceSides;
     private SpriteRenderer rend;
     public static bool coroutineAllowed = true;
-    [SerializeField] private GameObject cheater;
-    private GameController gameController;
-    
+
+    public static DiceControl Instance { get; private set; }
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
 
     private void Start() {
         rend = GetComponent<SpriteRenderer>();
-        gameController = cheater.GetComponent<GameController>();
         diceSides = Resources.LoadAll<Sprite>("DiceSides/");
         rend.sprite = diceSides[5];
     }
@@ -37,7 +48,7 @@ public class DiceControl : MonoBehaviour
         transform.localPosition = new Vector3(0, 0, 0);
     }
 
-    private IEnumerator RollTheDice(){
+    public IEnumerator RollTheDice(){
         // Disable Dice Roll after rolling
         DiceControl.coroutineAllowed = false;
         int randomDiceSide = 0;
@@ -49,7 +60,7 @@ public class DiceControl : MonoBehaviour
         }
 
         // Cheat Mode
-        int cheat = gameController.cheat_dice;
+        int cheat = GameController.Instance.diceSideCheat;
         if (cheat > 0)
         {
             GameController.diceSideThrown = cheat;  
@@ -61,9 +72,8 @@ public class DiceControl : MonoBehaviour
         {
             GameController.diceSideThrown = randomDiceSide + 1;    
         }
-
         // Action
-        GameController.RollPlayer(GameController.whoseTurn);
+        GameController.Instance.RollPlayer(GameController.whoseTurn);
 
     }
 

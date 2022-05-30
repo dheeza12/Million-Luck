@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3ec2cf07af96bb2498dd731692759ba6, type: 3}
-  m_Name: Sci1 1
+  m_Name: Sci2
   m_EditorClassIdentifier: 
   questionAndAnswers:
   - question: Which prominent physicist is credited with the discovery of gravity?

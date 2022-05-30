@@ -12,12 +12,12 @@ public class BoardIterate : MonoBehaviour
         Transform[] loadOut = transform.GetComponentsInChildren<Transform>();
         // GetComponentInChildren<Transform>() always include the parent aswell, the actual Length of Children would be -1
         int size = loadOut.Length - 1;
-    
+
         childsTransform = new Transform[size];
         childsGameObject = new GameObject[size];
         int i = 0;
 
-        foreach(Transform child in loadOut)
+        foreach (Transform child in loadOut)
         {
             // exclude the parent
             if (child != transform)
@@ -28,13 +28,10 @@ public class BoardIterate : MonoBehaviour
                 i++;
             }
         }
-        
+        Debug.Log(BoardIterate.boardCount);
     }
 
-    public static int CountIndex(){
-        return childsTransform.Length;
-    }
-
+    public static int boardCount { get { return childsTransform.Length; } }
     
 
 }

@@ -14,7 +14,7 @@ public class FollowPath : MonoBehaviour
     private void Start() {  
         string starterBlockName = "Starter" + contestantNumber.ToString();
 
-        for (int i = 0; i < BoardIterate.CountIndex(); i++)
+        for (int i = 0; i < BoardIterate.boardCount; i++)
         {
             if (starterBlockName == BoardIterate.childsTransform[i].name)
             {
@@ -40,7 +40,7 @@ public class FollowPath : MonoBehaviour
 
     private void Move() {
         
-        int destination = waypointIndex % BoardIterate.CountIndex();
+        int destination = waypointIndex % BoardIterate.boardCount;
         int playerNum = contestantNumber - 1;
         int step = (GameControl.playersStartWaypoint[playerNum] + GameControl.diceSideThrown);
 

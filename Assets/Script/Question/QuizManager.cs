@@ -17,12 +17,9 @@ public class QuizManager : MonoBehaviour
     private PlayerAttribute player0;
     private PlayerAttribute player1;
 
-
-
     private void OnEnable() {
-        // Select Category
-        GameController.RandomizeQuestion();
-        // Select Difficulty
+        // Select Category Select Difficulty
+        GameController.Instance.RandomizeQuestion();
 
         foreach (QuizAsset quizGroup in quizStore.quizAssets)
         {
@@ -36,7 +33,6 @@ public class QuizManager : MonoBehaviour
         {
             quizAsset = quizStore.quizAssets[Random.Range(0, quizStore.quizAssets.Length)];
         }
-
         player0 = GameController.players_ingame[GameController.attacker - 1].GetComponent<PlayerAttribute>();
         player1 = GameController.players_ingame[GameController.gettingAttacked - 1].GetComponent<PlayerAttribute>();
 
@@ -53,12 +49,11 @@ public class QuizManager : MonoBehaviour
     }
 
     public IEnumerator Questioning() {
-        Debug.Log("Start QUESTIONING");
         yield return waitAnswerChoices.Reset();
         AnswerScript starterPressedButton = waitAnswerChoices.PressedButton.GetComponent<AnswerScript>();
 
-        if (GameController.gettingAttacked > 0)
-        {
+        if (GameController.gettingAttacked != GameController.players_ingame.Length)
+        {   // Not NPC
             playerTurn.SetText(string.Format("{0}...Answer me this", player1.playerName));
             playerTurn.alignment = TextAlignmentOptions.Right;
             yield return waitAnswerChoices.Reset();
@@ -70,20 +65,28 @@ public class QuizManager : MonoBehaviour
             {
                 GameController.players_ingame[GameController.gettingAttacked - 1].GetComponent<PlayerAttribute>().ChangeWinPoint(2);
             }
+            else // wrong answer
+            {
+                GameController.Instance.TakeDamage(GameController.gettingAttacked);
+            }
             AttackedPressedButton.Answer();
         }
                 
+        // Battle Initiator
         if (starterPressedButton.isCorrect)
         {
             GameController.players_ingame[GameController.attacker - 1].GetComponent<PlayerAttribute>().ChangeWinPoint(2);
         }
-        else
+        else // wrong answer
         {
-
+            GameController.Instance.TakeDamage(GameController.attacker);
         }
         starterPressedButton.Answer();
 
+        yield return new WaitForSeconds(2.22f);
+        GameController.Instance.ResetBattle();
         gameObject.SetActive(false);
+        
     }
 
     private void GenerateQuestion() {
