@@ -10,6 +10,8 @@ public class Helper
         return (T)v.GetValue(Random.Range(0, v.Length));
     }
 
+
+    // p1 def - p2 atk
     public static int GetSubtractPlayers(int p1, int p2)
     {
         int damageTake = GameController.players_ingame[p1].GetComponent<PlayerAttribute>().defend -

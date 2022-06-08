@@ -27,19 +27,32 @@ public class DiceControl : MonoBehaviour
         rend = GetComponent<SpriteRenderer>();
         diceSides = Resources.LoadAll<Sprite>("DiceSides/");
         rend.sprite = diceSides[5];
+        StartMorbing(GameController.DiceMode.Move);
+    }
+
+    private void OnEnable()
+    {
+        GameController.Instance.DiceModeChangeEvent += StartMorbing;
+    }
+
+    public void StartMorbing(GameController.DiceMode diceMode)
+    {
+        transform.localScale = new Vector2(0.9f, 0.9f);
+        transform.LeanScale(Vector2.one, 0.44f).setEaseInOutCubic().setLoopPingPong();
+
     }
 
     private void OnMouseDown() {
         if (!GameController.gameOver && coroutineAllowed)
         {
-            StartCoroutine("RollTheDice");
+            StartCoroutine(RollTheDice());
         }
     }
 
     public void RollAnyway() {
         if (!GameController.gameOver && coroutineAllowed)
         {
-            StartCoroutine("RollTheDice");
+            StartCoroutine(RollTheDice());
         }
     }
 
@@ -50,6 +63,7 @@ public class DiceControl : MonoBehaviour
 
     public IEnumerator RollTheDice(){
         // Disable Dice Roll after rolling
+        LeanTween.cancel(gameObject);
         DiceControl.coroutineAllowed = false;
         int randomDiceSide = 0;
         for (int i = 0; i < 20; i++)
@@ -74,7 +88,6 @@ public class DiceControl : MonoBehaviour
         }
         // Action
         GameController.Instance.RollPlayer(GameController.whoseTurn);
-
     }
 
 }

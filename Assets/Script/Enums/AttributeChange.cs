@@ -6,7 +6,8 @@ namespace AttributeChange
         scoreChanged,
         winChanged,
         ResetChanged,
+        defMode,
         attackMode,
-        defMode
+        LevelChanged,
     }
 }

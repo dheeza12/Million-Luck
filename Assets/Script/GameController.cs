@@ -37,6 +37,14 @@ public class GameController : MonoBehaviour
     public static QuizAsset.QuestionType questionType;
     public static QuizAsset.QuestionDifficulty questionDifficulty;
 
+     // winWin
+    public int[] winNeed = { 10, 2, 6, 14 };
+
+    // scoreWin
+    public int[] scoreNeed = { 10, 25, 60, 140 };
+
+
+
     public static GameController Instance { get; private set; }
 
     private void Awake()
@@ -126,8 +134,9 @@ public class GameController : MonoBehaviour
         playerDamageTakenAttribute.ChangeHitPoint(damageTaken);
         if (playerDamageTakenAttribute.hp <= 0)
         {
+            // display dead here
+
             playerDamageTakenAttribute.ChangeHitPoint(- playerDamageTakenAttribute.hp);
-            Debug.Log("A player died");
         }
     }
 
@@ -159,6 +168,8 @@ public class GameController : MonoBehaviour
                 break;
 
             case DiceMode.DoubleMove:
+                player.StartMove();
+                whoseTurn -= 1;
                 break;
 
             case DiceMode.Attack:
@@ -192,13 +203,15 @@ public class GameController : MonoBehaviour
                 }
 
                 break;
-
+            // points distribution management
             case DiceMode.FreePoint:
-                player.playerAttribute.ChangeScorePoint(diceSideThrown * round);
+                int freePoint = Mathf.RoundToInt(diceSideThrown + diceSideThrown * round * 0.5f);
+                player.playerAttribute.ChangeScorePoint(freePoint);
                 break;
 
             case DiceMode.LosePoint:
-                player.playerAttribute.ChangeScorePoint(-diceSideThrown * round / 2);
+                int negaPoint = Mathf.RoundToInt(- player.playerAttribute.score * 0.5f / (6 - diceSideThrown));
+                player.playerAttribute.ChangeScorePoint(negaPoint);
                 break;
 
             case DiceMode.QuizMode:
@@ -210,6 +223,7 @@ public class GameController : MonoBehaviour
                 {
                     player.playerAttribute.ChangeHitPoint(+3);
                 }
+                NextTurn();
                 break;
 
             default:
@@ -221,7 +235,7 @@ public class GameController : MonoBehaviour
         }
     }
 
-    // Identify block to change diceMode accordingly
+    // Identify block to act accordingly
     public bool BlockActionDone(BlockType blockType) {
         switch (blockType)
         {
@@ -240,15 +254,65 @@ public class GameController : MonoBehaviour
                 
                 break;
             case BlockType.DoubleMove:
-                whoseTurn -= 1;
+                ChangeDiceMode(DiceMode.DoubleMove);
                 break;
             case BlockType.PlayerHome:
-                // needed code
+                HomeCheckpoint(whoseTurn);
                 break;
             default:
                 break;
         }
         return nextTurn;
+    }
+
+   
+    public IEnumerator SetNextObjective() 
+    {
+        // showing objective
+        ButtonsManager.Instance.objective.SetActive(true);
+        WaitForUIButtons objButtonChoice = new WaitForUIButtons(ButtonsManager.Instance.objButton);
+        yield return objButtonChoice.Reset();
+        ButtonsManager.Instance.objective.SetActive(false);
+        DiceModeChangeEvent?.Invoke(diceMode);
+    }
+
+    public void HomeCheckpoint(int playerNo)
+    {
+        // for level 0
+        PlayerAttribute player = players_ingame[playerNo - 1].GetComponent<PlayerAttribute>();
+        if (player.level == 0)
+        {
+            StartCoroutine(SetNextObjective());
+            // level 0 advance by only getting score
+            if (player.score > winNeed[player.level])
+            {
+                player.ChangeLevel(1);
+            }
+            
+        }
+        else if (player.level != 4)
+        {
+            StartCoroutine(SetNextObjective());
+            switch (player.winCondition)
+            {
+                case PlayerAttribute.WinCondition.winWin:
+                    if (player.win > winNeed[player.level])
+                    {
+                        player.ChangeLevel(1);
+                    }
+                    break;
+                case PlayerAttribute.WinCondition.ScoreWin:
+                    if (player.score > scoreNeed[player.level])
+                    {
+                        player.ChangeLevel(1);
+                    }
+                    break;
+            }
+        }
+        else
+        {
+            gameOver = true;
+        }
     }
 
     public void RandomizeQuestion() {
@@ -280,8 +344,20 @@ public class GameController : MonoBehaviour
         yield return StartCoroutine(quizManager.Questioning());
     }
 
+
+    public bool PlayerIsDead(int playerNo)
+    {
+        if (players_ingame[playerNo - 1].GetComponent<PlayerAttribute>().hp <= 0)
+        {
+            return true;
+        }
+        return false;
+    }
+
     public void NextTurn(){
         whoseTurn += 1;
+
+        Debug.Log("NextTurn()");
         if (whoseTurn > numPlayer)
         {
             whoseTurn = 1;
@@ -293,7 +369,7 @@ public class GameController : MonoBehaviour
         // Check if player died
 
         // ChangeDiceMode to Revive once
-        if (players_ingame[whoseTurn - 1].GetComponent<PlayerAttribute>().hp <= 0)
+        if (PlayerIsDead(whoseTurn))
         {
             ChangeDiceMode(DiceMode.Revive);
         }

@@ -11,10 +11,18 @@ public class ButtonsManager : MonoBehaviour
     [Header("Battle Buttons Array")]
     public Button[] buttonsBattle;
 
-    [Header("Battle Prompt UI")]
+    [Header("Home Buttons Array")]
+    public Button[] homeButton;
+    [Header("Obj Buttons Array")]
+    public Button[] objButton;
+
+    [Header("Popups")]
     public GameObject battleDesuka;
+    public GameObject Home;
+    public GameObject objective;
 
     public static ButtonsManager Instance { get; private set; }
+
     private void Awake()
     {
         if (Instance == null)

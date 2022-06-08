@@ -8,7 +8,7 @@ public class PlayerUIComponent : MonoBehaviour
 {
     [SerializeField] private PlayerAttribute player;
     [Header("UI Components")]
-    [Header("Hp and win conditions")]
+    [Header("Hp, score, and win")]
     [SerializeField] private TextMeshProUGUI hpText;
     [SerializeField] private TextMeshProUGUI MoneyText;
     [SerializeField] private TextMeshProUGUI winText;
@@ -54,7 +54,7 @@ public class PlayerUIComponent : MonoBehaviour
     }
 
     private void UpdatePlayerUI(ChangedPoint changedEnum, int hp, int score, int win) {
-        hpText.SetText(string.Format("{0}/{1}", hp, player.maxHP));
+        hpText.SetText(string.Format("{0}/{1}", player.hp, player.maxHP));
         MoneyText.SetText(score.ToString());
         winText.SetText(win.ToString());
     }

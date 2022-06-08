@@ -72,7 +72,7 @@ public class QuizManager : MonoBehaviour
             AttackedPressedButton.Answer();
         }
                 
-        // Battle Initiator
+        // Battle attacker
         if (starterPressedButton.isCorrect)
         {
             GameController.players_ingame[GameController.attacker - 1].GetComponent<PlayerAttribute>().ChangeWinPoint(2);
@@ -83,7 +83,7 @@ public class QuizManager : MonoBehaviour
         }
         starterPressedButton.Answer();
 
-        yield return new WaitForSeconds(2.22f);
+        yield return new WaitForSeconds(1.22f);
         GameController.Instance.ResetBattle();
         gameObject.SetActive(false);
         

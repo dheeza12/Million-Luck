@@ -28,7 +28,6 @@ public class BoardIterate : MonoBehaviour
                 i++;
             }
         }
-        Debug.Log(BoardIterate.boardCount);
     }
 
     public static int boardCount { get { return childsTransform.Length; } }

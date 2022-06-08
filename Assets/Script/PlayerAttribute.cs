@@ -11,12 +11,14 @@ public class PlayerAttribute : MonoBehaviour
     [Header("Player Attributes")]
     [SerializeField] public int maxHP;
     [HideInInspector] public int hp;
-    
-    [Header("Win Conditions")]
+
     [SerializeField] public int level = 0;
     [SerializeField] public int score = 0;
     [SerializeField] public int win = 0;
+    public enum WinCondition { winWin, ScoreWin }
+    public WinCondition winCondition;
 
+    [Header("Battle Status")]
     public int attack;
     public int defend;
 
@@ -29,6 +31,9 @@ public class PlayerAttribute : MonoBehaviour
 
     public delegate void BattleStat(ChangedPoint mode);
     public static event BattleStat BattleStatChanged;
+
+    public delegate void LevelChanged();
+    public static event LevelChanged LevelSelect;
 
     private void Start() {
         // In play, Shoot event to let UI update
@@ -58,9 +63,14 @@ public class PlayerAttribute : MonoBehaviour
         StatChanged?.Invoke(ChangedPoint.ResetChanged, hp, score, win);
     }
 
+    public void ChangeLevel(int hit)
+    {
+        level += hit;
+        LevelSelect?.Invoke();
+    }
+
     public void ChangeHitPoint(int hit) {
         hp += hit;
-        Debug.Log(hit);
         StatChanged?.Invoke(ChangedPoint.hpChanged, hp, score, win);
     }
     public void ChangeScorePoint(int hit) {

@@ -13,6 +13,7 @@ public class Path : MonoBehaviour
     [SerializeField] private float moveSpeed = 5f;
 
     [HideInInspector] public PlayerAttribute playerAttribute;
+    [SerializeField] private int playerHomeIndex;
     private WaitForUIButtons waitWaypointChoice;
     private WaitForUIButtons waitBattleChoice;
     private Button[] buttonsWaypoint;
@@ -23,10 +24,11 @@ public class Path : MonoBehaviour
         for (int i = 0; i < BoardIterate.boardCount; i++)
         {
             // Find starter block using loop to find name that match in Board
-            // Starter1, Starter2, ... *might change to into an attribute at Waypoints*
+            // Player1, Player2, ... *might change to into an attribute at Waypoints*
             if (gameObject.name == BoardIterate.childsTransform[i].name)
             {
                 transform.position = BoardIterate.childsTransform[i].position;
+                playerHomeIndex = i;
                 waypointIndex = i;
                 startWaypoint = i;
             }
@@ -38,16 +40,17 @@ public class Path : MonoBehaviour
 
     }
 
-    public void StartMove(){
+    public void StartMove()
+    {
         StartCoroutine(Move());
 
         // Coroutine act in parallel so any subsequence script here will be running atm
     }
 
     public IEnumerator Move() {
-        
         int endIndex = startWaypoint + GameController.diceSideThrown;
         int step = GameController.diceSideThrown;
+        int playerNo = GameController.whoseTurn;
         bool newEndIndex;
         bool nextTurn = false;
 
@@ -62,7 +65,7 @@ public class Path : MonoBehaviour
             }
         }
         
-        while (!nextTurn) {
+        while (!nextTurn & !GameController.Instance.PlayerIsDead(playerNo)) {
             int destination = (waypointIndex) % BoardIterate.boardCount;
             // Check when player position is at destination block
 
@@ -89,14 +92,20 @@ public class Path : MonoBehaviour
                     {
                         newEndIndex = false;
                     }
-                    // Compare waypoint between players
+                    
+                    // checking for path stopper (players, home)
+                    // Check when not already start battle
                     if (!GameController.battleInProgress)
                     {
+                        // Compare waypoint between players
                         for (int i = 0; i < player_list_waypoint_index.Length; i++)
                         {
                             // exclude self and null
                             if (i != GameController.whoseTurn - 1 & players_list[i] != null)
                             {
+                                //                                                      | maybe for the case that the starter pos is the same for players,
+                                //                                                      V So, no attack at the same pos when start moving 
+                                //                                                        Might make nested if someday
                                 if (player_list_waypoint_index[i] == waypointIndex & step < GameController.diceSideThrown)
                                 {
                                     GameController.attacker = GameController.whoseTurn;
@@ -107,19 +116,45 @@ public class Path : MonoBehaviour
                                     // Wait for any Button pressed
                                     yield return waitBattleChoice.Reset();
                                     ButtonsManager.Instance.battleDesuka.SetActive(false);
+                                    // Yes clicked
                                     if (waitBattleChoice.PressedButton == buttonsBattle[0])
                                     {
                                         yield return StartCoroutine(GameController.Instance.PlayerBattle(opponentNumber: i));
                                         endIndex = player_list_waypoint_index[i];
                                         newEndIndex = false;
                                     }
+                                    // else run everything after
                                     
                                     
                                 }
                             }
+                            
                         }
+                        // I need it to check again incase, so it doesn't overlap with pvp
+                        if (!GameController.battleInProgress)
+                        {
+                            // Compare waypoint to home
+                            if (playerHomeIndex == waypointIndex % BoardIterate.boardCount & step < GameController.diceSideThrown)
+                            {
+                                ButtonsManager.Instance.Home.SetActive(true);
+                                WaitForUIButtons homeButtonChoice = new WaitForUIButtons(ButtonsManager.Instance.homeButton);
+                                yield return homeButtonChoice.Reset();
+                                ButtonsManager.Instance.Home.SetActive(false);
+                                // select Yes
+                                if (homeButtonChoice.PressedButton == ButtonsManager.Instance.homeButton[0])
+                                {
+                                    endIndex = waypointIndex;
+                                    newEndIndex = false;
+
+                                }
+
+                            }
+                        }
+
                     }
                     
+                    
+
 
                     if (newEndIndex)
                     {
@@ -170,8 +205,8 @@ public class Path : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
         // Next turn
-        // wayppointIndex point to the next block, we want it to be at start when next turn
-        waypointIndex--;
+        startWaypoint = waypointIndex - 1;
+        waypointIndex = startWaypoint;
         GameController.Instance.NextTurn();
        
     }    
