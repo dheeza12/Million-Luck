@@ -95,5 +95,12 @@ public class PlayerAttribute : MonoBehaviour
         defend = def;
         BattleStatChanged?.Invoke(ChangedPoint.defMode);
     }    
-    
+
+    public void ChangeWinCondition(WinCondition newWinCondition)
+    {
+        winCondition = newWinCondition;
+        LevelSelect?.Invoke();
+    }
+
+
 }

@@ -35,10 +35,15 @@ public class DiceControl : MonoBehaviour
         GameController.Instance.DiceModeChangeEvent += StartMorbing;
     }
 
+    private void OnDisable()
+    {
+        GameController.Instance.DiceModeChangeEvent -= StartMorbing;
+    }
+
     public void StartMorbing(GameController.DiceMode diceMode)
     {
-        transform.localScale = new Vector2(0.9f, 0.9f);
-        transform.LeanScale(Vector2.one, 0.44f).setEaseInOutCubic().setLoopPingPong();
+        transform.localScale = new Vector2(0.8f, 0.8f);
+        transform.LeanScale(Vector2.one, 0.66f).setEaseInOutCubic().setLoopPingPong();
 
     }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using AttributeChange;
+using UnityEngine.UI;
 
 public class PlayerUIComponent : MonoBehaviour
 {
@@ -17,10 +18,20 @@ public class PlayerUIComponent : MonoBehaviour
     [SerializeField] private TextMeshProUGUI constestantNoText;
     [SerializeField] private TextMeshProUGUI playerNameText;
 
+    private Sprite[] questSprite;
+    [Header("Level text, sprite")]
+
+    [SerializeField] private TextMeshProUGUI level;
+    [SerializeField] private TextMeshProUGUI neededLevel;
+    [SerializeField] private Image displayQuest;
+
+
+
     private void OnEnable() 
     {
         player.NotInGame += DisableUI;
         player.StatChanged += UpdatePlayerUI;
+        PlayerAttribute.LevelSelect += UpdateLevel;
     }
 
     private void OnDisable() 
@@ -28,7 +39,8 @@ public class PlayerUIComponent : MonoBehaviour
         if (player != null)
         {
             player.NotInGame -= DisableUI;
-            player.StatChanged -= UpdatePlayerUI;    
+            player.StatChanged -= UpdatePlayerUI;
+            PlayerAttribute.LevelSelect -= UpdateLevel;
         }
         
     }
@@ -46,7 +58,9 @@ public class PlayerUIComponent : MonoBehaviour
             player.playerName = player.gameObject.name;
         }
         constestantNoText.SetText("CONTESTANT "+ player.name[player.name.Length - 1]);
-        
+
+        questSprite = Resources.LoadAll<Sprite>("Currency/");
+
     }
 
     private void DisableUI(){
@@ -57,5 +71,27 @@ public class PlayerUIComponent : MonoBehaviour
         hpText.SetText(string.Format("{0}/{1}", player.hp, player.maxHP));
         MoneyText.SetText(score.ToString());
         winText.SetText(win.ToString());
+    }
+
+    private void UpdateLevel()
+    {
+        level.SetText(string.Format("Level: {0}", player.level+1));
+        if (player.level < GameController.Instance.winNeed.Length)
+        {
+            switch (player.winCondition)
+            {
+                case PlayerAttribute.WinCondition.winWin:
+                    neededLevel.SetText(string.Format("Needed {0}", GameController.Instance.winNeed[player.level]));
+                    displayQuest.sprite = questSprite[0];
+                    break;
+                case PlayerAttribute.WinCondition.ScoreWin:
+                    neededLevel.SetText(string.Format("Needed {0}", GameController.Instance.scoreNeed[player.level]));
+                    displayQuest.sprite = questSprite[1];
+                    break;
+                default:
+                    break;
+            }
+        }
+        
     }
 }

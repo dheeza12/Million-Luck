@@ -10,11 +10,12 @@ public class GameController : MonoBehaviour
     public Transform playersTransform;
     public static int numPlayer = 4;
     public static Transform[] players_ingame = new Transform[5];
+    public static PlayerAttribute currentPlayerAttribute { get { return players_ingame[whoseTurn - 1].GetComponent<PlayerAttribute>(); } }
 
     // Dices
     public static int diceSideThrown = 0;
     public int diceSideCheat = 0;
-    public enum DiceMode{Move, DoubleMove, Attack, Defend, FreePoint, LosePoint, QuizMode, Revive}
+    public enum DiceMode{Move, DoubleMove, Attack, Defend, FreePoint, LosePoint, QuizMode, Revive, Disable}
     public static DiceMode diceMode;
     public delegate void DiceModeChange(DiceMode newMode);
     public event DiceModeChange DiceModeChangeEvent;
@@ -43,6 +44,9 @@ public class GameController : MonoBehaviour
     // scoreWin
     public int[] scoreNeed = { 10, 25, 60, 140 };
 
+    [Header("End Screen")]
+    [SerializeField] private GameObject EndScreen;
+
 
 
     public static GameController Instance { get; private set; }
@@ -52,7 +56,6 @@ public class GameController : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -86,16 +89,26 @@ public class GameController : MonoBehaviour
 
 
     // Perform 1 time mode change
-    public void ChangeDiceMode(DiceMode newMode)
+    public void ChangeDiceMode(DiceMode newMode, bool showUI=true)
     {
         if (diceMode != newMode)
         {
             DiceControl.coroutineAllowed = true;
+
             nextTurn = false;
             diceMode = newMode;
 
             // Fire event for UI to catch
-            DiceModeChangeEvent?.Invoke(diceMode);
+            if (showUI)
+            {
+                DiceModeChangeEvent?.Invoke(diceMode);
+            }
+            
+            
+            if (diceMode == DiceMode.DoubleMove)
+            {
+                nextTurn = true;
+            }
         }
     }
 
@@ -134,9 +147,25 @@ public class GameController : MonoBehaviour
         playerDamageTakenAttribute.ChangeHitPoint(damageTaken);
         if (playerDamageTakenAttribute.hp <= 0)
         {
-            // display dead here
+            playerDamageTakenAttribute.ChangeHitPoint(-playerDamageTakenAttribute.hp);
+            playerDamageTakenAttribute.ChangeScorePoint(-playerDamageTakenAttribute.score / 2);
+        }
+    }
 
-            playerDamageTakenAttribute.ChangeHitPoint(- playerDamageTakenAttribute.hp);
+    public void StealPoint()
+    {
+        PlayerAttribute player1Attribute = players_ingame[attacker - 1].GetComponent<PlayerAttribute>();
+        PlayerAttribute player2Attribute = players_ingame[gettingAttacked - 1].GetComponent<PlayerAttribute>();
+
+        // p1 ded p2 live
+        if ((player1Attribute.hp == 0) & (player2Attribute.hp > 0))
+        {
+            // score already deducted at TakingDamage()
+            player2Attribute.ChangeScorePoint(player1Attribute.score);
+        }
+        else if (player2Attribute.hp == 0 & player1Attribute.hp > 0)
+        {
+            player1Attribute.ChangeScorePoint(player2Attribute.score);
         }
     }
 
@@ -160,7 +189,8 @@ public class GameController : MonoBehaviour
     public void RollPlayer(int playerToMove)
     {   
         Path player = players_ingame[playerToMove - 1].GetComponent<Path>();
-
+        
+        
         switch (diceMode)
         {
             case DiceMode.Move:
@@ -168,8 +198,6 @@ public class GameController : MonoBehaviour
                 break;
 
             case DiceMode.DoubleMove:
-                player.StartMove();
-                whoseTurn -= 1;
                 break;
 
             case DiceMode.Attack:
@@ -229,10 +257,12 @@ public class GameController : MonoBehaviour
             default:
                 break;
         }
+                                // Limiting player to 1 double move per turn
         if (!battleInProgress)
         {
             nextTurn = true;
         }
+
     }
 
     // Identify block to act accordingly
@@ -251,14 +281,24 @@ public class GameController : MonoBehaviour
                 {
                     StartCoroutine(PlayerBattle(players_ingame.Length - 1));
                 }
-                
                 break;
+
             case BlockType.DoubleMove:
                 ChangeDiceMode(DiceMode.DoubleMove);
+                whoseTurn -= 1;
                 break;
+
             case BlockType.PlayerHome:
-                HomeCheckpoint(whoseTurn);
+                if (diceMode != DiceMode.Disable)
+                {
+                    ChangeDiceMode(DiceMode.Disable);
+                    nextTurn = false;
+                    // Keeping nextTurn from turning true
+                    battleInProgress = true;
+                    HomeCheckpoint(whoseTurn);
+                }
                 break;
+
             default:
                 break;
         }
@@ -273,7 +313,8 @@ public class GameController : MonoBehaviour
         WaitForUIButtons objButtonChoice = new WaitForUIButtons(ButtonsManager.Instance.objButton);
         yield return objButtonChoice.Reset();
         ButtonsManager.Instance.objective.SetActive(false);
-        DiceModeChangeEvent?.Invoke(diceMode);
+        battleInProgress = false;
+        nextTurn = true;
     }
 
     public void HomeCheckpoint(int playerNo)
@@ -290,8 +331,9 @@ public class GameController : MonoBehaviour
             }
             
         }
-        else if (player.level != 4)
+        else if (player.level < winNeed.Length - 1)
         {
+            Debug.Log("Next Level");
             StartCoroutine(SetNextObjective());
             switch (player.winCondition)
             {
@@ -312,6 +354,7 @@ public class GameController : MonoBehaviour
         else
         {
             gameOver = true;
+            EndScreen.SetActive(true);
         }
     }
 
@@ -357,14 +400,23 @@ public class GameController : MonoBehaviour
     public void NextTurn(){
         whoseTurn += 1;
 
-        Debug.Log("NextTurn()");
+        //Debug.Log("NextTurn()");
+        
+        // cyclying
         if (whoseTurn > numPlayer)
         {
             whoseTurn = 1;
             round += 1;
         }
-        // Normal next turn
-        ChangeDiceMode(DiceMode.Move);
+
+        if (diceMode == DiceMode.DoubleMove)
+        {
+            ChangeDiceMode(DiceMode.Move, showUI: false);
+        }
+        else
+        {
+            ChangeDiceMode(DiceMode.Move);
+        }
 
         // Check if player died
 

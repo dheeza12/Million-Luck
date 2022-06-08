@@ -75,16 +75,21 @@ public class Objective : MonoBehaviour
             winButtonComp.gameObject.SetActive(true);
         }
 
-        winButton.SetText(string.Format("Have more than {0} Win scores", GameController.Instance.winNeed[player.level]));
-        scoreButton.SetText(string.Format("Have more than {0} Lucky scores", GameController.Instance.scoreNeed[player.level]));
+        if (player.level < GameController.Instance.winNeed.Length)
+        {
+            winButton.SetText(string.Format("Have more than {0} Win scores", GameController.Instance.winNeed[player.level]));
+            scoreButton.SetText(string.Format("Have more than {0} Lucky scores", GameController.Instance.scoreNeed[player.level]));
+        }
+        
     }
 
     public void ChangeWinConditionWin()
     {
-        player.winCondition = PlayerAttribute.WinCondition.winWin;
+        player.ChangeWinCondition(PlayerAttribute.WinCondition.winWin);
     }
+
     public void ChangeWinConditionScore()
     {
-        player.winCondition = PlayerAttribute.WinCondition.ScoreWin;
+        player.ChangeWinCondition(PlayerAttribute.WinCondition.ScoreWin);
     }
 }

@@ -59,7 +59,7 @@ public class Path : MonoBehaviour
         int[] player_list_waypoint_index = new int[4];
         for (int i = 0; i < player_list_waypoint_index.Length; i++)
         {
-            if (players_list[i] != null)
+            if (players_list[i] != null && players_list[i].GetComponent<PlayerAttribute>().hp != 0)
             {
                 player_list_waypoint_index[i] = players_list[i].GetComponent<Path>().startWaypoint;
             }

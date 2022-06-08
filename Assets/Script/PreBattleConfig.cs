@@ -93,12 +93,12 @@ public class PreBattleConfig : MonoBehaviour
             if (GameController.whoseTurn == GameController.attacker)
             {
                 // atkDefStat[1].SetText(string.Format("{0}", players[1].attack));
-                dicePos[1].gameObject.GetComponent<TextMeshProUGUI>().SetText(string.Format("atk: {0}", players[1].attack));
+                dicePos[1].GetComponent<TextMeshProUGUI>().SetText(string.Format("{0}", players[1].attack));
             }
             else // attacked attacking
             {
                 // atkDefStat[0].SetText(string.Format("{0}", players[0].attack));
-                dicePos[0].gameObject.GetComponent<TextMeshProUGUI>().SetText(string.Format("atk: {0}", players[0].attack));
+                dicePos[0].GetComponent<TextMeshProUGUI>().SetText(string.Format("{0}", players[0].attack));
             }
         }
         else if (mode == ChangedPoint.defMode)
@@ -108,30 +108,32 @@ public class PreBattleConfig : MonoBehaviour
             {
                 //atkDefStat[1].SetText(string.Format("{0}", players[1].defend));
                 int damage = Helper.GetSubtractPlayers(GameController.gettingAttacked - 1, GameController.attacker - 1);
-                hpDamage[1].SetText(string.Format("taking damage: {0}", (damage)));
+                hpDamage[1].SetText(string.Format("{0}", (damage)));
+                dicePos[1].GetComponent<TextMeshProUGUI>().SetText("");
+                dicePos[0].GetComponent<TextMeshProUGUI>().SetText("");
+                yield return new WaitForSeconds(1.22f);
             }
             else // last turn
             {
                 turnAnnotate.SetText(string.Format("Starting Question"));
                 turnAnnotate.alignment = TextAlignmentOptions.Center;
-                // atkDefStat[0].SetText(string.Format("{0}", players[0].defend));
 
-                // return dice to original position
-                diceTransform.GetComponent<DiceControl>().ResetPos();
+                
                 // Show Damage to be taken
                 int damage = Helper.GetSubtractPlayers(GameController.attacker - 1, GameController.gettingAttacked - 1);
-                hpDamage[0].SetText(string.Format("taking damage: {0}", (damage)));
+                hpDamage[0].SetText(string.Format("{0}", (damage)));
 
-                yield return new WaitForSeconds(1.66f);
+                yield return new WaitForSeconds(1.22f);
 
                 // Start Questioning from GameController
                 StartCoroutine(GameController.Instance.StartQuizCoroutine());
+                // return dice to original position
+                diceTransform.GetComponent<DiceControl>().ResetPos();
                 gameObject.SetActive(false);
 
             }
         }
 
-        // hpDamage[0].SetText(string.Format("HPdmg: {0}", (Helper.GetSubtractPlayers(GameController.attacker - 1, GameController.gettingAttacked - 1))));
-        // hpDamage[1].SetText(string.Format("HPdmg: {0}", (Helper.GetSubtractPlayers(GameController.gettingAttacked - 1, GameController.attacker - 1))));
+        
     }
 }

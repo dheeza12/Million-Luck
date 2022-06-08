@@ -51,6 +51,7 @@ public class QuizManager : MonoBehaviour
     public IEnumerator Questioning() {
         yield return waitAnswerChoices.Reset();
         AnswerScript starterPressedButton = waitAnswerChoices.PressedButton.GetComponent<AnswerScript>();
+        bool attackedCorrect = false;
 
         if (GameController.gettingAttacked != GameController.players_ingame.Length)
         {   // Not NPC
@@ -64,6 +65,7 @@ public class QuizManager : MonoBehaviour
             if (AttackedPressedButton.isCorrect)
             {
                 GameController.players_ingame[GameController.gettingAttacked - 1].GetComponent<PlayerAttribute>().ChangeWinPoint(2);
+                attackedCorrect = true;
             }
             else // wrong answer
             {
@@ -82,8 +84,19 @@ public class QuizManager : MonoBehaviour
             GameController.Instance.TakeDamage(GameController.attacker);
         }
         starterPressedButton.Answer();
+        // Not bot
+        if (GameController.gettingAttacked != GameController.players_ingame.Length)
+        {
+            if (starterPressedButton.isCorrect | attackedCorrect)
+            {
+                GameController.Instance.StealPoint();
+            }
 
-        yield return new WaitForSeconds(1.22f);
+            
+        }
+            
+
+        yield return new WaitForSeconds(2.22f);
         GameController.Instance.ResetBattle();
         gameObject.SetActive(false);
         

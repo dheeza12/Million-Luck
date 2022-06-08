@@ -29,32 +29,30 @@ public class TransUIComponent : MonoBehaviour
     private void TransitionTurn()
     {
         SetVisible();
-
         background.alpha = 0;
         background.LeanAlpha(1, 0.5f);
-
-
         
         textBox.transform.localPosition = new Vector2(Screen.width * 2, 0);
-        textBox.transform.LeanMoveLocalX(0, 0.66f).setEaseInOutExpo().delay = 0.1f;
-        SetInvisible();
+        textBox.transform.LeanMoveLocalX(0, 0.66f).setEaseInOutExpo().setOnComplete(SetInvisible).delay = 0.1f;
+        
     }
 
     private void TransitionMode()
     {
-        // Set to visible
-        selfAlpha.LeanAlpha(1, 1f);
+        // reset state
+        SetVisible();
         // set if whole overlay bg is to cover whole screen
         background.alpha = 0;
 
         textBox.transform.localPosition = new Vector2(0, -Screen.height);
-        textBox.transform.LeanMoveLocalY(0, 0.66f).setEaseInOutExpo().delay = 0.1f;
-        SetInvisible();
+        textBox.transform.LeanMoveLocalY(0, 0.66f).setEaseInOutExpo().setOnComplete(SetInvisible).delay = 0.1f;
+        
     }
 
 
     private void SetVisible()
     {
+        selfAlpha.alpha = 0;
         selfAlpha.LeanAlpha(1, 0.5f);
         selfAlpha.interactable = true;
         selfAlpha.blocksRaycasts = true;
@@ -66,8 +64,11 @@ public class TransUIComponent : MonoBehaviour
         selfAlpha.blocksRaycasts = false;
     }
 
-    private float delayTime = 1.22f;
+    private float delayTime = 0.66f;
     private void ChangeMode(GameController.DiceMode newDiceMode){
+        LeanTween.cancel(selfAlpha.gameObject);
+        LeanTween.cancel(background.gameObject);
+        LeanTween.cancel(textBox.gameObject);
         switch (newDiceMode)
         {
             // Move is only when NewTurn() is run'd
