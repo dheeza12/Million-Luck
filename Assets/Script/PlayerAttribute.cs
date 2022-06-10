@@ -26,7 +26,7 @@ public class PlayerAttribute : MonoBehaviour
     public delegate void PlayerStart();
     public event PlayerStart NotInGame;
 
-    public delegate void PlayerAction(ChangedPoint mode, int hp, int score, int win);
+    public delegate void PlayerAction(ChangedPoint mode, int change);
     public event PlayerAction StatChanged;
 
     public delegate void BattleStat(ChangedPoint mode);
@@ -60,7 +60,7 @@ public class PlayerAttribute : MonoBehaviour
         hp = maxHP;
         score = 0;
         win = 0;
-        StatChanged?.Invoke(ChangedPoint.ResetChanged, hp, score, win);
+        StatChanged?.Invoke(ChangedPoint.ResetChanged, 0);
     }
 
     public void ChangeLevel(int hit)
@@ -71,7 +71,7 @@ public class PlayerAttribute : MonoBehaviour
 
     public void ChangeHitPoint(int hit) {
         hp += hit;
-        StatChanged?.Invoke(ChangedPoint.hpChanged, hp, score, win);
+        StatChanged?.Invoke(ChangedPoint.hpChanged, hit);
     }
     public void ChangeScorePoint(int hit) {
         score += hit;
@@ -79,11 +79,11 @@ public class PlayerAttribute : MonoBehaviour
         {
             score = 0;
         }
-        StatChanged?.Invoke(ChangedPoint.scoreChanged, hp, score, win);
+        StatChanged?.Invoke(ChangedPoint.luckChanged, hit);
     }
     public void ChangeWinPoint(int hit) {
         win += hit;
-        StatChanged?.Invoke(ChangedPoint.winChanged, hp, score, win);
+        StatChanged?.Invoke(ChangedPoint.winChanged, hit);
     }
 
     public void ChangeAttack(int atk) {

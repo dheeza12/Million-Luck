@@ -11,7 +11,7 @@ public class PlayerUIComponent : MonoBehaviour
     [Header("UI Components")]
     [Header("Hp, score, and win")]
     [SerializeField] private TextMeshProUGUI hpText;
-    [SerializeField] private TextMeshProUGUI MoneyText;
+    [SerializeField] private TextMeshProUGUI luckText;
     [SerializeField] private TextMeshProUGUI winText;
 
     [Header("Identity")]
@@ -67,10 +67,26 @@ public class PlayerUIComponent : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    private void UpdatePlayerUI(ChangedPoint changedEnum, int hp, int score, int win) {
+    private void UpdatePlayerUI(ChangedPoint changedEnum, int change) {
         hpText.SetText(string.Format("{0}/{1}", player.hp, player.maxHP));
-        MoneyText.SetText(score.ToString());
-        winText.SetText(win.ToString());
+        luckText.SetText(player.score.ToString());
+        winText.SetText(player.win.ToString());
+
+        Transform originTransform = luckText.transform;
+        switch (changedEnum)
+        {
+            case ChangedPoint.hpChanged:
+                originTransform = hpText.transform;
+                break;
+            case ChangedPoint.luckChanged:
+                originTransform = luckText.transform;
+                break;
+            case ChangedPoint.winChanged:
+                originTransform = winText.transform;
+                break;
+        }
+        PointsPopper.Instance.SpawnPopping(changedEnum, originTransform, change);
+
     }
 
     private void UpdateLevel()

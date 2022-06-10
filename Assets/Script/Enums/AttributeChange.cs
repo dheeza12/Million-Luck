@@ -3,7 +3,7 @@ namespace AttributeChange
     public enum ChangedPoint
     {
         hpChanged,
-        scoreChanged,
+        luckChanged,
         winChanged,
         ResetChanged,
         defMode,
