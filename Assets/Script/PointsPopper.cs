@@ -50,6 +50,10 @@ public class PointsPopper : MonoBehaviour
             else if (spriteParent.GetChild(i).gameObject.activeSelf) 
             {
                 amount_count++;
+                if (amount_count > spriteParent.childCount)
+                {
+                    amount_count = spriteParent.childCount;
+                }
                 continue;
             }
 

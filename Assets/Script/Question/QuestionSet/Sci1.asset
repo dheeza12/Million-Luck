@@ -20,5 +20,19 @@ MonoBehaviour:
     - Stephen Hawking
     - 'Galileo '
     correctAnswer: 1
+  - question: What is the unit for measuring the amplitude of a sound?
+    answers:
+    - Centibel
+    - Millibel
+    - Decibel
+    - Annabel
+    correctAnswer: 3
+  - question: What is generally used for the inside of a pencil?
+    answers:
+    - Obsidian
+    - Charcoal
+    - Lead
+    - Graphite
+    correctAnswer: 4
   questionType: 1
   questionDifficulty: 0

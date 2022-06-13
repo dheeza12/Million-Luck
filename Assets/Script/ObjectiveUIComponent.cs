@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class Objective : MonoBehaviour
+public class ObjectiveUIComponent : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI objectiveText;
     [SerializeField] private TextMeshProUGUI scoreButton;
@@ -47,11 +47,11 @@ public class Objective : MonoBehaviour
         {
             case PlayerAttribute.WinCondition.winWin:
                 scoreButtonComp.gameObject.SetActive(false);
-                winButton.SetText(string.Format("Reach {0} Win scores", GameController.Instance.winNeed[player.level]));
+                winButton.SetText(string.Format("Reach >{0} Win scores", GameController.Instance.winNeed[player.level]));
                 break;
             case PlayerAttribute.WinCondition.ScoreWin:
                 winButtonComp.gameObject.SetActive(false);
-                scoreButton.SetText(string.Format("Reach {0} Lucky scores", GameController.Instance.scoreNeed[player.level]));
+                scoreButton.SetText(string.Format("Reach >{0} Lucky scores", GameController.Instance.scoreNeed[player.level]));
                 break;
             default:
                 break;
@@ -78,7 +78,7 @@ public class Objective : MonoBehaviour
         if (player.level < GameController.Instance.winNeed.Length)
         {
             winButton.SetText(string.Format("Have more than {0} Win scores", GameController.Instance.winNeed[player.level]));
-            scoreButton.SetText(string.Format("Have more than {0} Lucky scores", GameController.Instance.scoreNeed[player.level]));
+            scoreButton.SetText(string.Format("Have more than {0} Quiz Money", GameController.Instance.scoreNeed[player.level]));
         }
         
     }

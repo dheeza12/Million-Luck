@@ -41,7 +41,6 @@ public class TransUIComponent : MonoBehaviour
     {
         // reset state
         SetVisible();
-        // set if whole overlay bg is to cover whole screen
         background.alpha = 0;
 
         textBox.transform.localPosition = new Vector2(0, -Screen.height);
@@ -66,6 +65,7 @@ public class TransUIComponent : MonoBehaviour
 
     private float delayTime = 0.66f;
     private void ChangeMode(GameController.DiceMode newDiceMode){
+        // Reset state
         LeanTween.cancel(selfAlpha.gameObject);
         LeanTween.cancel(background.gameObject);
         LeanTween.cancel(textBox.gameObject);
@@ -77,19 +77,19 @@ public class TransUIComponent : MonoBehaviour
                 TransitionTurn();
                 break;
             case GameController.DiceMode.DoubleMove:
-                textBox.SetText("Move 1 more time");
+                textBox.SetText("1 More Move");
                 TransitionMode();
                 break;
-            case GameController.DiceMode.FreePoint:
-                textBox.SetText("Free Score");
+            case GameController.DiceMode.FreeMoney:
+                textBox.SetText("Bonus Quiz Money");
                 TransitionMode();
                 break;
-            case GameController.DiceMode.LosePoint:
-                textBox.SetText("Dropping score");
+            case GameController.DiceMode.LoseMoney:
+                textBox.SetText("Dropping Quiz Money");
                 TransitionMode();
                 break;
             case GameController.DiceMode.Revive:
-                textBox.SetText(string.Format("Constestant {0}'s Roll to revive", GameController.whoseTurn));
+                textBox.SetText(string.Format("Constestant {0}'s Roll to Revive", GameController.whoseTurn));
                 TransitionMode();
                 break;
             default:

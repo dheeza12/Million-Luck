@@ -71,7 +71,7 @@ public class DiceControl : MonoBehaviour
         LeanTween.cancel(gameObject);
         DiceControl.coroutineAllowed = false;
         int randomDiceSide = 0;
-        for (int i = 0; i < 20; i++)
+        for (int i = 0; i < 12; i++)
         {
             randomDiceSide = Random.Range(0, 6);
             rend.sprite = diceSides[randomDiceSide];

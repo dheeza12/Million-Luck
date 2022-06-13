@@ -53,8 +53,9 @@ public class QuizManager : MonoBehaviour
         AnswerScript starterPressedButton = waitAnswerChoices.PressedButton.GetComponent<AnswerScript>();
         bool attackedCorrect = false;
 
+        // Not NPC
         if (GameController.gettingAttacked != GameController.players_ingame.Length)
-        {   // Not NPC
+        {   
             playerTurn.SetText(string.Format("{0}...Answer me this", player1.playerName));
             playerTurn.alignment = TextAlignmentOptions.Right;
             yield return waitAnswerChoices.Reset();

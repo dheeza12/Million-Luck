@@ -91,17 +91,17 @@ public class PlayerUIComponent : MonoBehaviour
 
     private void UpdateLevel()
     {
-        level.SetText(string.Format("Level: {0}", player.level+1));
-        if (player.level < GameController.Instance.winNeed.Length)
+        level.SetText(string.Format("Level: {0}", player.level));
+        if (player.level < GameController.Instance.winNeed.Length - 1)
         {
             switch (player.winCondition)
             {
                 case PlayerAttribute.WinCondition.winWin:
-                    neededLevel.SetText(string.Format("Needed {0}", GameController.Instance.winNeed[player.level]));
+                    neededLevel.SetText(string.Format("Needed >{0}", GameController.Instance.winNeed[player.level]));
                     displayQuest.sprite = questSprite[0];
                     break;
                 case PlayerAttribute.WinCondition.ScoreWin:
-                    neededLevel.SetText(string.Format("Needed {0}", GameController.Instance.scoreNeed[player.level]));
+                    neededLevel.SetText(string.Format("Needed >{0}", GameController.Instance.scoreNeed[player.level]));
                     displayQuest.sprite = questSprite[1];
                     break;
                 default:

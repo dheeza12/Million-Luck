@@ -15,7 +15,7 @@ public class GameController : MonoBehaviour
     // Dices
     public static int diceSideThrown = 0;
     public int diceSideCheat = 0;
-    public enum DiceMode{Move, DoubleMove, Attack, Defend, FreePoint, LosePoint, QuizMode, Revive, Disable}
+    public enum DiceMode{Move, DoubleMove, Attack, Defend, FreeMoney, LoseMoney, QuizMode, Revive, Disable}
     public static DiceMode diceMode;
     public delegate void DiceModeChange(DiceMode newMode);
     public event DiceModeChange DiceModeChangeEvent;
@@ -88,7 +88,7 @@ public class GameController : MonoBehaviour
     }
 
 
-    // Perform 1 time mode change
+    // Perform 1 time mode change and fire an event if showUI
     public void ChangeDiceMode(DiceMode newMode, bool showUI=true)
     {
         if (diceMode != newMode)
@@ -160,7 +160,7 @@ public class GameController : MonoBehaviour
         // p1 ded p2 live
         if ((player1Attribute.hp == 0) & (player2Attribute.hp > 0))
         {
-            // score already deducted at TakingDamage()
+            // score already deducted at TakeDamage() so p1 don't need to lose point here
             player2Attribute.ChangeScorePoint(player1Attribute.score);
         }
         else if (player2Attribute.hp == 0 & player1Attribute.hp > 0)
@@ -177,7 +177,7 @@ public class GameController : MonoBehaviour
         {
             playerFought.ResetAtkDef();
         }
-
+        attacker = 0;
         gettingAttacked = 0;
         battleInProgress = false;
         battleTurn = 0;
@@ -232,13 +232,13 @@ public class GameController : MonoBehaviour
 
                 break;
             // points distribution management
-            case DiceMode.FreePoint:
+            case DiceMode.FreeMoney:
                 int freePoint = Mathf.RoundToInt(diceSideThrown + diceSideThrown * round * 0.5f);
                 player.playerAttribute.ChangeScorePoint(freePoint);
                 break;
 
-            case DiceMode.LosePoint:
-                int negaPoint = Mathf.RoundToInt(- player.playerAttribute.score * 0.5f / (6 - diceSideThrown));
+            case DiceMode.LoseMoney:
+                int negaPoint = Mathf.RoundToInt(- player.playerAttribute.score * 0.5f / (7 - diceSideThrown));
                 player.playerAttribute.ChangeScorePoint(negaPoint);
                 break;
 
@@ -270,10 +270,10 @@ public class GameController : MonoBehaviour
         switch (blockType)
         {
             case BlockType.Lucky:
-                ChangeDiceMode(DiceMode.FreePoint);
+                ChangeDiceMode(DiceMode.FreeMoney);
                 break;
             case BlockType.Unlucky:
-                ChangeDiceMode(DiceMode.LosePoint);
+                ChangeDiceMode(DiceMode.LoseMoney);
                 break;
             case BlockType.Quiz:
                 // Quiz enter PlayerBattle which change diceMode, which will then cause ChangeDiceMode to occur
@@ -291,8 +291,10 @@ public class GameController : MonoBehaviour
             case BlockType.PlayerHome:
                 if (diceMode != DiceMode.Disable)
                 {
-                    ChangeDiceMode(DiceMode.Disable);
+                    ChangeDiceMode(DiceMode.Disable, showUI:false);
                     nextTurn = false;
+                    DiceControl.coroutineAllowed = false;
+                    LeanTween.cancel(DiceControl.Instance.gameObject);
                     // Keeping nextTurn from turning true
                     battleInProgress = true;
                     HomeCheckpoint(whoseTurn);
@@ -331,9 +333,8 @@ public class GameController : MonoBehaviour
             }
             
         }
-        else if (player.level < winNeed.Length - 1)
+        else if (player.level < winNeed.Length - 1) // excluded last level
         {
-            Debug.Log("Next Level");
             StartCoroutine(SetNextObjective());
             switch (player.winCondition)
             {
@@ -353,8 +354,24 @@ public class GameController : MonoBehaviour
         }
         else
         {
-            gameOver = true;
-            EndScreen.SetActive(true);
+            switch (player.winCondition)
+            {
+                case PlayerAttribute.WinCondition.winWin:
+                    if (player.win > winNeed[player.level])
+                    {
+                        gameOver = true;
+                        EndScreen.SetActive(true);
+                    }
+                    break;
+
+                case PlayerAttribute.WinCondition.ScoreWin:
+                    if (player.score > scoreNeed[player.level])
+                    {
+                        gameOver = true;
+                        EndScreen.SetActive(true);
+                    }
+                    break;
+            }
         }
     }
 
