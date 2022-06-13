@@ -10,7 +10,8 @@ public class GameController : MonoBehaviour
     public Transform playersTransform;
     public static int numPlayer = 4;
     public static Transform[] players_ingame = new Transform[5];
-    public static PlayerAttribute currentPlayerAttribute { get { return players_ingame[whoseTurn - 1].GetComponent<PlayerAttribute>(); } }
+    public static PlayerAttribute currentPlayerAttribute { 
+        get { return players_ingame[whoseTurn - 1].GetComponent<PlayerAttribute>(); } }
 
     // Dices
     public static int diceSideThrown = 0;
@@ -85,6 +86,7 @@ public class GameController : MonoBehaviour
 
         numPlayer = j;
         diceMode = DiceMode.Move;
+        currentPlayerAttribute.GetComponent<Path>().StartMorbing();
     }
 
 
@@ -443,6 +445,7 @@ public class GameController : MonoBehaviour
             ChangeDiceMode(DiceMode.Revive);
         }
 
+        currentPlayerAttribute.GetComponent<Path>().StartMorbing();
         DiceControl.coroutineAllowed = true;
         
     }

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class TransUIComponent : MonoBehaviour
 {
@@ -17,7 +18,7 @@ public class TransUIComponent : MonoBehaviour
 
     private int curPlayer;
     [SerializeField] private TextMeshProUGUI textBox;
-    [SerializeField] private CanvasGroup background;
+    [SerializeField] private CanvasGroup backgroundCanvasGroup;
     private CanvasGroup selfAlpha;
 
     private void Start()
@@ -29,8 +30,8 @@ public class TransUIComponent : MonoBehaviour
     private void TransitionTurn()
     {
         SetVisible();
-        background.alpha = 0;
-        background.LeanAlpha(1, 0.5f);
+        backgroundCanvasGroup.alpha = 0;
+        backgroundCanvasGroup.LeanAlpha(1, 0.5f);
         
         textBox.transform.localPosition = new Vector2(Screen.width * 2, 0);
         textBox.transform.LeanMoveLocalX(0, 0.66f).setEaseInOutExpo().setOnComplete(SetInvisible).delay = 0.1f;
@@ -41,11 +42,13 @@ public class TransUIComponent : MonoBehaviour
     {
         // reset state
         SetVisible();
-        background.alpha = 0;
+        backgroundCanvasGroup.alpha = 0;
 
         textBox.transform.localPosition = new Vector2(0, -Screen.height);
-        textBox.transform.LeanMoveLocalY(0, 0.66f).setEaseInOutExpo().setOnComplete(SetInvisible).delay = 0.1f;
-        
+        textBox.transform.parent.localPosition = new Vector2(0, -Screen.height);
+        textBox.transform.LeanMoveLocalY(0, 0.66f).setEaseInOutExpo().delay = 0.1f;
+        textBox.transform.parent.LeanMoveLocalY(0, 0.66f).setEaseInOutExpo().setOnComplete(SetInvisible).delay = 0.1f;
+
     }
 
 
@@ -67,7 +70,7 @@ public class TransUIComponent : MonoBehaviour
     private void ChangeMode(GameController.DiceMode newDiceMode){
         // Reset state
         LeanTween.cancel(selfAlpha.gameObject);
-        LeanTween.cancel(background.gameObject);
+        LeanTween.cancel(backgroundCanvasGroup.gameObject);
         LeanTween.cancel(textBox.gameObject);
         switch (newDiceMode)
         {

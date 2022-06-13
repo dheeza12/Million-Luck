@@ -44,8 +44,13 @@ public class PlayerUIComponent : MonoBehaviour
         }
         
     }
-    
-    
+
+    public void StartMorbing(GameController.DiceMode diceMode)
+    {
+        transform.localScale = new Vector2(0.8f, 0.8f);
+        transform.LeanScale(Vector2.one, 0.66f).setEaseInOutCubic().setLoopPingPong();
+
+    }
     private void Start() {
         // Set Name
         if (player.playerName != "")

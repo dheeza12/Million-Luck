@@ -36,7 +36,7 @@ public class Tooltip : MonoBehaviour
 
     }
 
-    private void UpdatePos()
+    private void Update()
     {
         Vector2 anchoredPosition = Input.mousePosition / canvasRect.localScale.x;
         if (anchoredPosition.x + bgRect.rect.width > canvasRect.rect.width)
@@ -53,7 +53,6 @@ public class Tooltip : MonoBehaviour
     public void ShowTooltip(string newString)
     {
         gameObject.SetActive(true);
-        UpdatePos();
         SetText(newString);
     }
 

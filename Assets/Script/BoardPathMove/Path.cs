@@ -42,9 +42,22 @@ public class Path : MonoBehaviour
 
     public void StartMove()
     {
+        StopMorbing();
         StartCoroutine(Move());
 
         // Coroutine act in parallel so any subsequence script here will be running atm
+    }
+    public void StartMorbing()
+    {
+        transform.localScale = new Vector2(0.9f, 0.9f);
+        transform.LeanScale(Vector2.one, 0.33f).setEaseInOutCubic().setLoopPingPong();
+
+    }
+
+    public void StopMorbing()
+    {
+        transform.LeanScale(Vector2.one, 0.33f).setEaseInOutCubic();
+        LeanTween.cancel(gameObject);
     }
 
     public IEnumerator Move() {

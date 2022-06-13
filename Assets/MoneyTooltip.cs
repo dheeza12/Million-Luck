@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class HPTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class MoneyTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     //Detect if the Cursor starts to pass over the GameObject
     public void OnPointerEnter(PointerEventData pointerEventData)
     {
-        Tooltip.Instance.ShowTooltip("HP:\n *instead of normal turn,\n player need to roll for 5 or more if HP is 0");
+        Tooltip.Instance.ShowTooltip("Quiz Money:\n get from landing on yellow block or\n 'KO' a player");
     }
 
     //Detect when Cursor leaves the GameObject

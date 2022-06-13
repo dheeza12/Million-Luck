@@ -35,6 +35,7 @@ public class PlayerAttribute : MonoBehaviour
     public delegate void LevelChanged();
     public static event LevelChanged LevelSelect;
 
+
     private void Start() {
         // In play, Shoot event to let UI update
         if (play)

@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class HPTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class WinTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     //Detect if the Cursor starts to pass over the GameObject
     public void OnPointerEnter(PointerEventData pointerEventData)
     {
-        Tooltip.Instance.ShowTooltip("HP:\n *instead of normal turn,\n player need to roll for 5 or more if HP is 0");
+        Tooltip.Instance.ShowTooltip("Wins:\n get from correctly answer a Quiz");
     }
 
     //Detect when Cursor leaves the GameObject
@@ -17,3 +17,4 @@ public class HPTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         Tooltip.Instance.HideTooltip();
     }
 }
+

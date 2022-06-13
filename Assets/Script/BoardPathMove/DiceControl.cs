@@ -46,6 +46,11 @@ public class DiceControl : MonoBehaviour
         transform.LeanScale(Vector2.one, 0.66f).setEaseInOutCubic().setLoopPingPong();
 
     }
+    public void StopMorbing()
+    {
+        transform.localScale = Vector2.one;
+        LeanTween.cancel(gameObject);
+    }
 
     private void OnMouseDown() {
         if (!GameController.gameOver && coroutineAllowed)
@@ -68,7 +73,7 @@ public class DiceControl : MonoBehaviour
 
     public IEnumerator RollTheDice(){
         // Disable Dice Roll after rolling
-        LeanTween.cancel(gameObject);
+        StopMorbing();
         DiceControl.coroutineAllowed = false;
         int randomDiceSide = 0;
         for (int i = 0; i < 12; i++)
