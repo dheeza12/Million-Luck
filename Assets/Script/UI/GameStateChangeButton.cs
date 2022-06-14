@@ -2,8 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using TMPro;
 
-public class PlayQuitButton : MonoBehaviour
+public class GameStateChangeButton : MonoBehaviour
 {
     public void Quit()
     {

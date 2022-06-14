@@ -16,4 +16,6 @@ public class HPTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     {
         Tooltip.Instance.HideTooltip();
     }
+
+
 }
