@@ -20,5 +20,26 @@ MonoBehaviour:
     - 64
     - 88
     correctAnswer: 2
+  - question: Hexagon have how many sides?
+    answers:
+    - 3
+    - 4
+    - 5
+    - 6
+    correctAnswer: 4
+  - question: Isosceles triangle have what characteristic?
+    answers:
+    - Two of the sides are equal in length
+    - Has three sides of the same length
+    - All side have different length
+    - One of the interior angle = 90 degree
+    correctAnswer: 4
+  - question: What is heavier, a kilogram of feathers, or a kilogram of iron?
+    answers:
+    - Feathers
+    - Iron
+    - Undetermineable
+    - None
+    correctAnswer: 4
   questionType: 0
   questionDifficulty: 0

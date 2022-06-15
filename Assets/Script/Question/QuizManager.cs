@@ -17,6 +17,8 @@ public class QuizManager : MonoBehaviour
     private PlayerAttribute player0;
     private PlayerAttribute player1;
 
+    [SerializeField] private RectTransform p0Tag, p1Tag;
+
     private void OnEnable() {
         // Select Category Select Difficulty
         GameController.Instance.RandomizeQuestion();
@@ -73,6 +75,15 @@ public class QuizManager : MonoBehaviour
                 GameController.Instance.TakeDamage(GameController.gettingAttacked);
             }
             AttackedPressedButton.Answer();
+
+            if (!p1Tag.gameObject.activeSelf)
+            {
+                p1Tag.gameObject.SetActive(true);
+            }
+            RectTransform p1 = AttackedPressedButton.GetComponent<RectTransform>();
+            p1Tag.position = new Vector3(p1.position.x, p1.position.y);
+            p1Tag.GetComponent<TextMeshProUGUI>().SetText(player1.playerName);
+            
         }
                 
         // Battle attacker
@@ -92,12 +103,19 @@ public class QuizManager : MonoBehaviour
             {
                 GameController.Instance.StealPoint();
             }
-
-            
         }
-            
+        if (!p0Tag.gameObject.activeSelf)
+        {
+            p0Tag.gameObject.SetActive(true);
+        }
+
+        RectTransform p0 = starterPressedButton.GetComponent<RectTransform>();
+        p0Tag.position = new Vector3(p0.position.x, p0.position.y);
+        p0Tag.GetComponent<TextMeshProUGUI>().SetText(player0.playerName);
 
         yield return new WaitForSeconds(2.22f);
+        p1Tag.gameObject.SetActive(false);
+        p0Tag.gameObject.SetActive(false);
         GameController.Instance.ResetBattle();
         gameObject.SetActive(false);
         

@@ -20,5 +20,27 @@ MonoBehaviour:
     - 1914
     - 1918
     correctAnswer: 1
+  - question: Which event is generally considered to be the first belligerent act
+      of World War II?
+    answers:
+    - "Germany\u2019s attack on Russia"
+    - Japan's attack on United State
+    - "Germany\u2019s attack on Britain"
+    - Germany's attack on Poland
+    correctAnswer: 4
+  - question: 'First woman to fly solo across the Atlantic Ocean '
+    answers:
+    - Amelia Earhart
+    - Marie Curie
+    - Princess Diana
+    - Ripley
+    correctAnswer: 1
+  - question: Which bank did Rama VI founded?
+    answers:
+    - Krung Thai Bank
+    - Kasikorn Bank
+    - Krungsi Aryuttaya Bank
+    - Government Saving Bank
+    correctAnswer: 4
   questionType: 2
   questionDifficulty: 0

@@ -34,5 +34,19 @@ MonoBehaviour:
     - Lead
     - Graphite
     correctAnswer: 4
+  - question: Balloons are filled with?
+    answers:
+    - Nitrogen
+    - Helium
+    - 'Oxygen '
+    - Argon
+    correctAnswer: 2
+  - question: Light year is a measurement of...
+    answers:
+    - Speed of light
+    - Time
+    - Stellar Distance
+    - Toys
+    correctAnswer: 3
   questionType: 1
   questionDifficulty: 0
